@@ -40,6 +40,8 @@ class WebCrawlerJSConcurrent:
         self.visited_urls: Set[str] = set()
         self.word_count_by_page: Dict[str, int] = {}
         self.page_contents: Dict[str, str] = {}
+        self.page_titles: Dict[str, str] = {}
+        self.page_timestamps: Dict[str, str] = {}
         self.page_categories: Dict[str, str] = {}
         self.page_languages: Dict[str, str] = {}
         self.technologies: Set[str] = set()
@@ -229,9 +231,15 @@ class WebCrawlerJSConcurrent:
             language = self._detect_language(url)
             technologies = self._detect_technologies(soup, html_content)
             
+            # Extract page title
+            page_title = soup.title.string.strip() if soup.title and soup.title.string else ""
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             async with self.lock:
                 self.word_count_by_page[url] = word_count
                 self.page_contents[url] = text
+                self.page_titles[url] = page_title
+                self.page_timestamps[url] = timestamp
                 self.page_categories[url] = category
                 self.page_languages[url] = language
                 self.technologies.update(technologies)
@@ -295,6 +303,7 @@ class WebCrawlerJSConcurrent:
     
     async def crawl(self, max_pages: int = None):
         """Start crawling from the base URL using concurrent workers."""
+        start_time = time.time()
         self.lock = asyncio.Lock()
         print(f"Starting concurrent crawl of {self.base_url}")
         print(f"Domain: {self.base_domain}")
@@ -331,6 +340,8 @@ class WebCrawlerJSConcurrent:
         
         print("-" * 60)
         print("\nCrawl Complete!")
+        elapsed_time = time.time() - start_time
+        print(f"Time taken: {elapsed_time:.2f} seconds")
         self.print_statistics()
     
     def print_statistics(self):
@@ -385,14 +396,16 @@ class WebCrawlerJSConcurrent:
                 date_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 writer.writerow([self.base_url, date_updated, tech_str])
                 
-                # Row 2: Headers for page data
-                writer.writerow(['Page URL', 'Word Count', 'Content'])
+                # Row 2: Headers matching format.csv
+                writer.writerow(['url', 'html2text', 'page_title', 'timestamp'])
                 
-                # Row 3+: URL, Word Count, Content
+                # Row 3+: Data
                 sorted_pages = sorted(self.word_count_by_page.items(), key=lambda x: x[1], reverse=True)
                 for url, count in sorted_pages:
                     content = self.page_contents.get(url, "")
-                    writer.writerow([url, count, content])
+                    title = self.page_titles.get(url, "")
+                    timestamp = self.page_timestamps.get(url, "")
+                    writer.writerow([url, content, title, timestamp])
             
             print(f"\nResults saved to {filename}")
         except Exception as e:
