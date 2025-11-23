@@ -116,24 +116,41 @@ class WebCrawlerJSConcurrent:
         # Check for common platforms in HTML content or scripts
         html_lower = html_content.lower()
         
-        if 'wp-content' in html_lower:
-            techs.add('WordPress')
-        if 'shopify' in html_lower:
-            techs.add('Shopify')
-        if 'wix.com' in html_lower:
-            techs.add('Wix')
-        if 'squarespace' in html_lower:
-            techs.add('Squarespace')
-        if 'joomla' in html_lower:
-            techs.add('Joomla')
-        if 'drupal' in html_lower:
-            techs.add('Drupal')
-        if 'magento' in html_lower:
-            techs.add('Magento')
-        if 'prestashop' in html_lower:
-            techs.add('PrestaShop')
-        if 'bigcommerce' in html_lower:
-            techs.add('BigCommerce')
+        # CMS / E-commerce
+        if 'wp-content' in html_lower: techs.add('WordPress')
+        if 'shopify' in html_lower: techs.add('Shopify')
+        if 'wix.com' in html_lower: techs.add('Wix')
+        if 'squarespace' in html_lower: techs.add('Squarespace')
+        if 'joomla' in html_lower: techs.add('Joomla')
+        if 'drupal' in html_lower: techs.add('Drupal')
+        if 'magento' in html_lower: techs.add('Magento')
+        if 'prestashop' in html_lower: techs.add('PrestaShop')
+        if 'bigcommerce' in html_lower: techs.add('BigCommerce')
+        if 'hubspot' in html_lower: techs.add('HubSpot')
+        if 'webflow' in html_lower: techs.add('Webflow')
+        if 'craft cms' in html_lower: techs.add('Craft CMS')
+        if 'bitrix' in html_lower: techs.add('Bitrix')
+
+        # JavaScript Frameworks/Libraries (checking specific indicators)
+        if 'react' in html_lower and ('react-dom' in html_lower or 'data-reactroot' in html_lower): techs.add('React')
+        if 'vue' in html_lower and ('vue.js' in html_lower or 'data-v-' in html_lower): techs.add('Vue.js')
+        if 'angular' in html_lower and ('ng-version' in html_lower or 'angular.js' in html_lower): techs.add('Angular')
+        if 'jquery' in html_lower: techs.add('jQuery')
+        if 'bootstrap' in html_lower: techs.add('Bootstrap')
+        if 'tailwind' in html_lower: techs.add('Tailwind CSS')
+        if 'next.js' in html_lower or '/_next/' in html_lower: techs.add('Next.js')
+        if 'nuxt' in html_lower or '/_nuxt/' in html_lower: techs.add('Nuxt.js')
+        if 'gatsby' in html_lower: techs.add('Gatsby')
+        if 'alpine.js' in html_lower or 'x-data' in html_lower: techs.add('Alpine.js')
+        
+        # Analytics/Marketing
+        if 'google-analytics' in html_lower or 'ga.js' in html_lower or 'gtag' in html_lower: techs.add('Google Analytics')
+        if 'googletagmanager' in html_lower: techs.add('Google Tag Manager')
+        if 'facebook-pixel' in html_lower or 'fbevents.js' in html_lower: techs.add('Facebook Pixel')
+        if 'hotjar' in html_lower: techs.add('Hotjar')
+        if 'intercom' in html_lower: techs.add('Intercom')
+        if 'drift' in html_lower: techs.add('Drift')
+        if 'klaviyo' in html_lower: techs.add('Klaviyo')
             
         return techs
 
@@ -351,9 +368,13 @@ class WebCrawlerJSConcurrent:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        # Clean domain name for filename
-        safe_domain = self.base_domain.replace(':', '_').replace('/', '_')
-        filename = os.path.join(output_dir, f"{safe_domain}.csv")
+        # Clean domain name for filename (remove www. and TLD like .no)
+        # Example: www.plussark.no -> plussark
+        domain_parts = self.base_domain.replace('www.', '').split('.')
+        # Take the first part as the name (e.g. 'plussark' from 'plussark.no')
+        safe_name = domain_parts[0] if domain_parts else 'unknown'
+        
+        filename = os.path.join(output_dir, f"{safe_name}.csv")
         
         try:
             with open(filename, 'w', newline='', encoding='utf-8') as f:
@@ -364,7 +385,10 @@ class WebCrawlerJSConcurrent:
                 date_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 writer.writerow([self.base_url, date_updated, tech_str])
                 
-                # Row 2+: URL, Word Count, Content
+                # Row 2: Headers for page data
+                writer.writerow(['Page URL', 'Word Count', 'Content'])
+                
+                # Row 3+: URL, Word Count, Content
                 sorted_pages = sorted(self.word_count_by_page.items(), key=lambda x: x[1], reverse=True)
                 for url, count in sorted_pages:
                     content = self.page_contents.get(url, "")
@@ -380,6 +404,7 @@ def main():
     parser = argparse.ArgumentParser(description="Concurrent Web Crawler with JavaScript Support")
     parser.add_argument("url", nargs='?', help="The starting URL to crawl")
     parser.add_argument("--input-csv", help="Path to CSV file containing URLs to crawl")
+    parser.add_argument("--limit-sites", type=int, default=None, help="Limit number of websites to crawl from CSV")
     parser.add_argument("--max-pages", type=int, default=None, help="Maximum number of pages to crawl (default: unlimited)")
     parser.add_argument("--delay", type=float, default=0.1, help="Delay between requests in seconds (default: 0.1)")
     parser.add_argument("--workers", type=int, default=5, help="Number of concurrent workers (default: 5)")
@@ -410,6 +435,9 @@ def main():
                     # "orgNumber,name,website"
                     reader = csv.DictReader(f)
                     rows = list(reader)
+
+            if args.limit_sites:
+                rows = rows[:args.limit_sites]
 
             total_sites = len(rows)
             print(f"Found {total_sites} websites to crawl.")
