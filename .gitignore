@@ -13,6 +13,7 @@ pip-delete-this-directory.txt
 
 # Crawler results
 crawl_results*.txt
+results/
 
 # Mac
 .DS_Store
