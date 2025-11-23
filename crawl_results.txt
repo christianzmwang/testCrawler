@@ -1,0 +1,119 @@
+Web Crawl Results for https://conta.no/
+JavaScript rendering: ENABLED (Concurrent)
+Workers: 10
+============================================================
+
+Total pages crawled: 716
+Total words found: 1,083,703
+Average words per page: 1513.6
+
+============================================================
+Word count by page:
+------------------------------------------------------------
+17,705 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/4000-innkjop-av-ravarer-og-halvfabrikata-hoy-avgiftssats
+17,611 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7000-drivstoff-biler
+17,604 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/4030-innkjop-av-ravarer-og-halvfabrikata-middels-avgiftssats
+17,599 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7020-vedlikehold-biler
+17,596 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6559-annet-driftsmateriale
+17,572 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7160-diettkostnad-ikke-oppgavepliktig
+17,568 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7080-bruk-av-privat-bil-i-naering
+17,549 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6560-rekvisita
+17,538 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/8960-overforinger-annen-egenkapital
+17,537 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7798-annen-kostnad-fradragsberettiget
+17,536 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6420-leie-datasystemer
+17,528 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6552-programvare
+17,528 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/5290-motkonto-for-gruppe-52
+17,527 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6800-kontorrekvisita
+17,522 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6590-annet-driftsmateriale
+17,521 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1500-kundefordring
+17,515 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7040-forsikring-biler
+17,512 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1920-bankkonto
+17,511 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2930-skyldig-lonn
+17,503 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/4300-innkjop-av-varer-for-videresalg-hoy-avgiftssats
+17,499 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/5915-overtidsmat
+17,492 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1580-avsetning-tap-pa-kundefordringer
+17,487 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2770-skyldig-arbeidsgiveravgift
+17,482 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2050-annen-egenkapital
+17,477 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1130-bygg-anlegg-og-maskiner-under-bygging-eget-bruk
+17,475 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1270-verktoy-o-l
+17,466 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2068-private-kostnader-til-elektronisk-kommunikasjon
+17,465 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1325-lan-til-andre-foretak-i-samme-konsern
+17,465 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1530-opptjent-ikke-fakturert-inntekt
+17,464 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1250-inventar
+17,460 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2066-motkonto-egen-bolig-i-naeringsbygg
+17,459 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1397-forskuddsleasing
+17,458 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1100-bygninger
+17,455 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2057-motkonto-bilgodtgjorelse-for-enkeltpersonforetak
+17,454 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1710-forskuddsbetalt-rentekostnad
+17,454 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/3000-salgsinntekt-avgiftspliktig-hoy-sats
+17,453 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1110-fast-teknisk-installasjon-i-bygning
+17,451 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/5210-fri-telefon
+17,451 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2065-egen-bolig-i-naeringsbygg
+17,449 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1743-forskuddsbetalt-forsikring
+17,448 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1700-forskuddsbetalt-leiekostnad
+17,447 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/3881-salgssum-immatr-eiendeler-og-varige-driftsmidler-avgiftspliktig-salg
+17,446 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7150-diettkostnad-oppgavepliktig
+17,446 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2075-privat-bruk-av-naeringsbil
+17,445 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/3882-salgssum-immatr-eiendeler-og-varige-driftsmidler-avgiftsfritt-salg
+17,445 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1150-tomter
+17,444 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1296-negativ-gevinst-og-tapskonto
+17,443 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1744-forskuddsbetalt-leasingleie
+17,442 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1280-kontormaskiner
+17,442 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2096-positiv-gevinst-og-tapskonto
+17,441 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/6200-elektrisitet-drivstoff-vann-til-produksjon
+17,441 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/8990-overforing-til-udekket-tap
+17,437 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/1742-forskuddsbetalt-strom-varme-mv
+17,436 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/4390-beholdningsendring
+17,435 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/7099-privat-bruk-av-naeringsbil
+17,434 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/5250-innberettet-skattepliktige-forsikringer
+17,433 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/5220-fri-avis
+17,427 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp/konto/2098-positiv-tommerkonto
+17,413 words [Norwegian] [kontohjelp] - https://conta.no/Kontohjelp
+17,413 words [Norwegian] [kontohjelp] - https://conta.no/kontohjelp
+2,592 words [Norwegian] [finn-regnskapsforer] - https://conta.no/finn-regnskapsforer
+2,206 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/wix
+1,516 words [Norwegian] [webinar] - https://conta.no/webinar
+1,268 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/timerabbit
+1,166 words [Norwegian] [regnskapsprogram-enkeltmannsforetak] - https://conta.no/regnskapsprogram-enkeltmannsforetak
+1,140 words [Norwegian] [fakturering] - https://conta.no/fakturering/fakturatips-for-ferskinger
+1,084 words [Norwegian] [karriere] - https://conta.no/karriere
+1,056 words [Norwegian] [regnskapsordbok] - https://conta.no/regnskapsordbok
+983 words [Norwegian] [regnskap] - https://conta.no/regnskap
+974 words [Norwegian] [regnskapsprogram-for-landbruk] - https://conta.no/regnskapsprogram-for-landbruk
+955 words [Norwegian] [faktura] - https://conta.no/faktura
+909 words [Norwegian] [starte-bedrift] - https://conta.no/starte-bedrift
+896 words [Norwegian] [priser] - https://conta.no/priser
+893 words [Norwegian] [regnskapsprogram-lag-og-foreninger] - https://conta.no/regnskapsprogram-lag-og-foreninger
+814 words [Norwegian] [ordresystem] - https://conta.no/ordresystem
+787 words [Norwegian] [arsoppgjorsprogram] - https://conta.no/arsoppgjorsprogram
+787 words [Norwegian] [regnskapsforing] - https://conta.no/regnskapsforing/slik-finner-du-riktig-regnskapskonto
+629 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/kravia
+599 words [Norwegian] [partner] - https://conta.no/partner
+563 words [Norwegian] [lonnssystem] - https://conta.no/lonnssystem
+560 words [Norwegian] [om-oss] - https://conta.no/om-oss
+553 words [Norwegian] [regnskapsprogram-store-bedrifter] - https://conta.no/regnskapsprogram-store-bedrifter
+551 words [Norwegian] [bedrifter-med-ansatte] - https://conta.no/bedrifter-med-ansatte
+541 words [Norwegian] [gratis-regnskapskurs] - https://conta.no/gratis-regnskapskurs
+524 words [Norwegian] [home] - https://conta.no/
+524 words [Norwegian] [home] - https://conta.no
+522 words [Norwegian] [ai-regnskap] - https://conta.no/ai-regnskap
+516 words [Norwegian] [regnskapsprogram] - https://conta.no/regnskapsprogram/utleiere
+515 words [Norwegian] [regnskapsprogram] - https://conta.no/regnskapsprogram/konsulenter-og-konsulentvirksomheter
+504 words [Norwegian] [regnskapsprogram] - https://conta.no/regnskapsprogram/bygg-og-anlegg
+498 words [Norwegian] [bytt-til-conta] - https://conta.no/bytt-til-conta
+491 words [Norwegian] [mobilapp] - https://conta.no/mobilapp
+490 words [Norwegian] [regnskapsprogram] - https://conta.no/regnskapsprogram/undervisning
+480 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/cordel
+475 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner
+471 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/shopify
+469 words [Norwegian] [timeforing] - https://conta.no/timeforing
+467 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/klarna
+461 words [Norwegian] [prosjekt] - https://conta.no/prosjekt
+460 words [Norwegian] [regnskapsprogram] - https://conta.no/regnskapsprogram/markedsforing
+449 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/vipps
+441 words [Norwegian] [oppdateringer] - https://conta.no/oppdateringer/sertifiseringskurs
+433 words [Norwegian] [integrasjoner] - https://conta.no/integrasjoner/stripe
+397 words [Norwegian] [bankintegrasjon] - https://conta.no/bankintegrasjon
+367 words [Norwegian] [regnskapsprogram-holdingselsskap] - https://conta.no/regnskapsprogram-holdingselsskap
+344 words [Norwegian] [blogg] - https://conta.no/blogg
+227 words [Norwegian] [komplett-pakke] - https://conta.no/komplett-pakke?_gl=1*18ebkeh*_gcl_au*MTY3NTE4NzY0OC4xNzUwODQ3MzEx
