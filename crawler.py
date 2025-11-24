@@ -465,6 +465,18 @@ def main():
                 if not website.startswith('http'):
                     website = 'https://' + website
                 
+                # Check if results already exist
+                parsed_url = urlparse(website)
+                domain = parsed_url.netloc
+                domain_parts = domain.replace('www.', '').split('.')
+                safe_name = domain_parts[0] if domain_parts else 'unknown'
+                output_dir = "results"
+                expected_filename = os.path.join(output_dir, f"{safe_name}.csv")
+                
+                if os.path.exists(expected_filename):
+                    print(f"\n[{i}/{total_sites}] Skipping {website} - Results already exist in {expected_filename}")
+                    continue
+                
                 print(f"\n[{i}/{total_sites}] Starting crawl for: {website}")
                 
                 crawler = WebCrawlerJSConcurrent(
