@@ -13,6 +13,9 @@ import time
 import re
 from typing import Set, Dict
 import sys
+import csv
+import os
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 
@@ -481,6 +484,42 @@ class WebCrawler:
                 f.write(f"{count:,} words [{language}] [{category}] - {url}\n")
         
         print(f"\nResults saved to {filename}")
+    
+    def save_results_csv(self, output_dir: str = "results"):
+        """Save results to a CSV file matching crawler.py format."""
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            
+        # Clean domain name for filename
+        domain_parts = self.base_domain.replace('www.', '').split('.')
+        safe_name = domain_parts[0] if domain_parts else 'unknown'
+        
+        filename = os.path.join(output_dir, f"{safe_name}.csv")
+        
+        try:
+            with open(filename, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                
+                # Row 1: Domain URL, Date Updated, Technologies (empty for trad crawler)
+                date_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                writer.writerow([self.base_url, date_updated, ""])
+                
+                # Row 2: Headers matching format.csv
+                writer.writerow(['url', 'html2text', 'page_title', 'timestamp'])
+                
+                # Row 3+: Data
+                sorted_pages = sorted(self.word_count_by_page.items(), key=lambda x: x[1], reverse=True)
+                for url, count in sorted_pages:
+                    # Trad crawler doesn't store content/title/timestamp per page in memory currently
+                    # We'll just write what we have or empty strings
+                    content = "" 
+                    title = ""
+                    timestamp = ""
+                    writer.writerow([url, content, title, timestamp])
+            
+            print(f"\nResults saved to {filename}")
+        except Exception as e:
+            print(f"Error saving results: {e}")
 
 
 def main():
@@ -509,6 +548,7 @@ def main():
     crawler = WebCrawler(url, delay=delay, max_workers=max_workers)
     crawler.crawl(max_pages=max_pages)
     crawler.save_results()
+    crawler.save_results_csv()
 
 
 if __name__ == "__main__":

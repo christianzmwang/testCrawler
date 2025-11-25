@@ -17,6 +17,90 @@ import sys
 import csv
 import os
 from datetime import datetime
+import requests
+from tradcrawler import WebCrawler
+from domain_analyzer import DomainAnalyzer
+
+# Field list for domain analysis CSV
+DOMAIN_FIELDS = [
+    'domain', 'timestamp', 'elapsed_ms', 'ip', 'tls_valid', 'tls_not_before', 
+    'tls_not_after', 'tls_days_to_expiry', 'tls_issuer', 'primary_cms', 
+    'cms_wordpress', 'cms_drupal', 'cms_joomla', 'cms_typo3', 'cms_shopify', 
+    'cms_wix', 'cms_squarespace', 'cms_webflow', 'cms_ghost', 'cms_duda', 
+    'cms_craft', 'ecom_woocommerce', 'ecom_magento', 'pay_stripe', 'pay_paypal', 
+    'pay_klarna', 'analytics_ga4', 'analytics_gtm', 'analytics_ua', 
+    'analytics_fb_pixel', 'analytics_linkedin', 'analytics_hotjar', 
+    'analytics_hubspot', 'js_react', 'js_vue', 'js_angular', 'js_nextjs', 
+    'js_nuxt', 'js_svelte', 'has_email_text', 'has_phone_text', 'html_kb', 
+    'html_kb_over_500', 'header_server', 'header_x_powered_by', 'security_hsts', 
+    'security_csp', 'cookies_present', 'cdn_hint', 'server_hint', 'risk_flags', 
+    'errors', 'cms_wordpress_html', 'risk_placeholder_kw', 'risk_parked_kw', 
+    'risk_suspended_kw'
+]
+
+def save_domain_analysis(analysis, filename="results/domain_analysis.csv"):
+    file_exists = os.path.exists(filename)
+    
+    with open(filename, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=DOMAIN_FIELDS)
+        if not file_exists:
+            writer.writeheader()
+        
+        # Ensure all fields are present
+        row = {field: analysis.get(field, '') for field in DOMAIN_FIELDS}
+        writer.writerow(row)
+
+def load_analyzed_domains(filename="results/domain_analysis.csv"):
+    analyzed = set()
+    if os.path.exists(filename):
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row.get('domain'):
+                        analyzed.add(row['domain'])
+        except Exception as e:
+            print(f"Warning: Could not read domain analysis file: {e}")
+    return analyzed
+
+
+def needs_js_crawler(url: str) -> bool:
+    """
+    Detect if a website likely requires JavaScript to render content.
+    Returns True if JS crawler should be used, False if traditional crawler is sufficient.
+    """
+    try:
+        # Fake a browser user agent
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        # 1. Check for specific "Enable JS" messages
+        text_lower = response.text.lower()
+        if "enable javascript" in text_lower or "javascript is required" in text_lower:
+            return True
+
+        # 2. Check content length (if < 50 words, it's suspicious)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Remove scripts and styles
+        for script in soup(['script', 'style', 'meta', 'noscript']):
+            script.decompose()
+            
+        text = soup.get_text()
+        words = len(text.split())
+        
+        if words < 50: 
+            return True
+            
+        return False # Safe to use tradcrawler
+        
+    except Exception as e:
+        # If the fast request fails entirely, might as well try the robust browser
+        print(f"Quick check failed ({e}), defaulting to JS crawler")
+        return True
+
 
 
 class WebCrawlerJSConcurrent:
@@ -412,6 +496,49 @@ class WebCrawlerJSConcurrent:
             print(f"Error saving results: {e}")
 
 
+class ProgressTracker:
+    def __init__(self, progress_file="results/progress.csv"):
+        self.progress_file = progress_file
+        self.ensure_file_exists()
+        self.history = self.load_history()
+
+    def ensure_file_exists(self):
+        directory = os.path.dirname(self.progress_file)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+        
+        if not os.path.exists(self.progress_file):
+            with open(self.progress_file, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['url', 'status', 'timestamp'])
+
+    def load_history(self):
+        history = {}
+        if os.path.exists(self.progress_file):
+            try:
+                with open(self.progress_file, 'r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if row.get('url'):
+                            history[row['url']] = row['status']
+            except Exception as e:
+                print(f"Warning: Could not read progress file: {e}")
+        return history
+
+    def update_status(self, url, status):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            with open(self.progress_file, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow([url, status, timestamp])
+            self.history[url] = status
+        except Exception as e:
+            print(f"Warning: Could not update progress file: {e}")
+
+    def is_completed(self, url):
+        return self.history.get(url) == 'completed'
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Concurrent Web Crawler with JavaScript Support")
@@ -455,6 +582,13 @@ def main():
             total_sites = len(rows)
             print(f"Found {total_sites} websites to crawl.")
             
+            # Initialize progress tracker
+            tracker = ProgressTracker()
+            
+            # Initialize domain analyzer
+            analyzer = DomainAnalyzer()
+            analyzed_domains = load_analyzed_domains()
+            
             for i, row in enumerate(rows, 1):
                 website = row.get('website')
                 if not website:
@@ -465,53 +599,126 @@ def main():
                 if not website.startswith('http'):
                     website = 'https://' + website
                 
-                # Check if results already exist
-                parsed_url = urlparse(website)
-                domain = parsed_url.netloc
-                domain_parts = domain.replace('www.', '').split('.')
-                safe_name = domain_parts[0] if domain_parts else 'unknown'
-                output_dir = "results"
-                expected_filename = os.path.join(output_dir, f"{safe_name}.csv")
-                
-                if os.path.exists(expected_filename):
-                    print(f"\n[{i}/{total_sites}] Skipping {website} - Results already exist in {expected_filename}")
+                # Check progress
+                if tracker.is_completed(website):
+                    print(f"\n[{i}/{total_sites}] Skipping {website} - Already completed.")
                     continue
                 
-                print(f"\n[{i}/{total_sites}] Starting crawl for: {website}")
+                # Domain Analysis
+                if website not in analyzed_domains:
+                    print(f"\n[{i}/{total_sites}] Analyzing domain: {website}")
+                    try:
+                        analysis = analyzer.analyze(website)
+                        save_domain_analysis(analysis)
+                        analyzed_domains.add(website)
+                        print(f"  -> Analysis saved. IP: {analysis.get('ip')}, CMS: {analysis.get('primary_cms')}")
+                    except Exception as e:
+                        print(f"  -> Analysis failed: {e}")
                 
-                crawler = WebCrawlerJSConcurrent(
-                    website, 
-                    delay=args.delay, 
-                    headless=not args.no_headless, 
-                    fast_mode=not args.no_fast, 
-                    max_workers=args.workers
-                )
+                print(f"\n[{i}/{total_sites}] Checking technology for: {website}")
                 
+                # Mark as started
+                tracker.update_status(website, 'started')
+                
+                crawl_success = False
                 try:
-                    asyncio.run(crawler.crawl(max_pages=args.max_pages))
+                    use_js_crawler = needs_js_crawler(website)
+                    
+                    if use_js_crawler:
+                        print(f"  -> Detected JavaScript dependency. Using Playwright crawler.")
+                        crawler = WebCrawlerJSConcurrent(
+                            website, 
+                            delay=args.delay, 
+                            headless=not args.no_headless, 
+                            fast_mode=not args.no_fast, 
+                            max_workers=args.workers
+                        )
+                        
+                        try:
+                            asyncio.run(crawler.crawl(max_pages=args.max_pages))
+                            crawl_success = True
+                        except Exception as e:
+                            print(f"Error crawling {website}: {e}")
+                            tracker.update_status(website, 'failed')
+                        finally:
+                            crawler.save_results()
+                    else:
+                        print(f"  -> Static content detected. Using fast traditional crawler.")
+                        # Use the traditional crawler
+                        crawler = WebCrawler(
+                            website,
+                            delay=args.delay,
+                            max_workers=args.workers
+                        )
+                        
+                        try:
+                            crawler.crawl(max_pages=args.max_pages)
+                            crawl_success = True
+                        except Exception as e:
+                            print(f"Error crawling {website}: {e}")
+                            tracker.update_status(website, 'failed')
+                        finally:
+                            # Use the new CSV save method we added
+                            crawler.save_results_csv()
+                    
+                    if crawl_success:
+                        tracker.update_status(website, 'completed')
+                        
+                except KeyboardInterrupt:
+                    print("\nCrawl interrupted by user.")
+                    tracker.update_status(website, 'interrupted')
+                    break
                 except Exception as e:
-                    print(f"Error crawling {website}: {e}")
-                finally:
-                    crawler.save_results()
+                    print(f"Unexpected error processing {website}: {e}")
+                    tracker.update_status(website, 'failed')
                     
         except Exception as e:
             print(f"Error processing CSV: {e}")
             
     elif args.url:
-        crawler = WebCrawlerJSConcurrent(
-            args.url, 
-            delay=args.delay, 
-            headless=not args.no_headless, 
-            fast_mode=not args.no_fast, 
-            max_workers=args.workers
-        )
-        
+        # Domain Analysis
+        print(f"Analyzing domain: {args.url}")
+        analyzer = DomainAnalyzer()
         try:
-            asyncio.run(crawler.crawl(max_pages=args.max_pages))
-        except KeyboardInterrupt:
-            print("\nCrawl interrupted by user.")
-        finally:
-            crawler.save_results()
+            analysis = analyzer.analyze(args.url)
+            save_domain_analysis(analysis)
+            print(f"  -> Analysis saved. IP: {analysis.get('ip')}, CMS: {analysis.get('primary_cms')}")
+        except Exception as e:
+            print(f"  -> Analysis failed: {e}")
+
+        print(f"Checking technology for: {args.url}")
+        use_js_crawler = needs_js_crawler(args.url)
+        
+        if use_js_crawler:
+            print(f"  -> Detected JavaScript dependency. Using Playwright crawler.")
+            crawler = WebCrawlerJSConcurrent(
+                args.url, 
+                delay=args.delay, 
+                headless=not args.no_headless, 
+                fast_mode=not args.no_fast, 
+                max_workers=args.workers
+            )
+            
+            try:
+                asyncio.run(crawler.crawl(max_pages=args.max_pages))
+            except KeyboardInterrupt:
+                print("\nCrawl interrupted by user.")
+            finally:
+                crawler.save_results()
+        else:
+            print(f"  -> Static content detected. Using fast traditional crawler.")
+            crawler = WebCrawler(
+                args.url,
+                delay=args.delay,
+                max_workers=args.workers
+            )
+            
+            try:
+                crawler.crawl(max_pages=args.max_pages)
+            except KeyboardInterrupt:
+                print("\nCrawl interrupted by user.")
+            finally:
+                crawler.save_results_csv()
     else:
         parser.print_help()
 
