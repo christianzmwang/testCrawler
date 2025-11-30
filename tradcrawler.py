@@ -34,6 +34,9 @@ class WebCrawler:
         self.delay = delay
         self.visited_urls: Set[str] = set()
         self.word_count_by_page: Dict[str, int] = {}
+        self.page_contents: Dict[str, str] = {}  # URL -> text content
+        self.page_titles: Dict[str, str] = {}  # URL -> page title
+        self.page_timestamps: Dict[str, str] = {}  # URL -> crawl timestamp
         self.page_categories: Dict[str, str] = {}  # URL -> category
         self.page_languages: Dict[str, str] = {}  # URL -> language
         self.total_words = 0
@@ -245,15 +248,22 @@ class WebCrawler:
             # Parse HTML
             soup = BeautifulSoup(response.text, 'html.parser')
             
+            # Extract page title before decomposing elements
+            page_title = soup.title.string.strip() if soup.title and soup.title.string else ""
+            
             # Extract and count words
             text = self.extract_text(soup)
             word_count = self.count_words(text)
             category = self._categorize_page(url)
             language = self._detect_language(url)
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
             # Thread-safe update of statistics
             with self.stats_lock:
                 self.word_count_by_page[url] = word_count
+                self.page_contents[url] = text  # Store the actual content
+                self.page_titles[url] = page_title
+                self.page_timestamps[url] = timestamp
                 self.page_categories[url] = category
                 self.page_languages[url] = language
                 self.total_words += word_count
@@ -510,11 +520,9 @@ class WebCrawler:
                 # Row 3+: Data
                 sorted_pages = sorted(self.word_count_by_page.items(), key=lambda x: x[1], reverse=True)
                 for url, count in sorted_pages:
-                    # Trad crawler doesn't store content/title/timestamp per page in memory currently
-                    # We'll just write what we have or empty strings
-                    content = "" 
-                    title = ""
-                    timestamp = ""
+                    content = self.page_contents.get(url, "")
+                    title = self.page_titles.get(url, "")
+                    timestamp = self.page_timestamps.get(url, "")
                     writer.writerow([url, content, title, timestamp])
             
             print(f"\nResults saved to {filename}")
