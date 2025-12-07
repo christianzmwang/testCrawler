@@ -89,7 +89,7 @@ class DomainAnalyzer:
             # 2. TLS/SSL
             try:
                 context = ssl.create_default_context()
-                with socket.create_connection((domain, 443), timeout=5) as sock:
+                with socket.create_connection((domain, 443), timeout=10) as sock:
                     with context.wrap_socket(sock, server_hostname=domain) as ssock:
                         cert = ssock.getpeercert()
                         
@@ -116,7 +116,7 @@ class DomainAnalyzer:
             # 3. HTTP Request
             start_time = time.time()
             try:
-                response = requests.get(url, headers=self.headers, timeout=10, verify=False)
+                response = requests.get(url, headers=self.headers, timeout=30, verify=False)
                 result['elapsed_ms'] = int((time.time() - start_time) * 1000)
                 
                 # Headers

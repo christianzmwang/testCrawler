@@ -236,7 +236,7 @@ class WebCrawler:
         
         try:
             print(f"Crawling: {url}")
-            response = self.session.get(url, timeout=10)
+            response = self.session.get(url, timeout=30)
             response.raise_for_status()
             
             # Only process HTML content

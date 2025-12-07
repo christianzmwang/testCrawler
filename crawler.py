@@ -74,7 +74,7 @@ def needs_js_crawler(url: str) -> bool:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=30)
         
         # 1. Check for specific "Enable JS" messages
         text_lower = response.text.lower()
