@@ -130,6 +130,7 @@ class WebCrawlerJSConcurrent:
         self.page_languages: Dict[str, str] = {}
         self.technologies: Set[str] = set()
         self.total_words = 0
+        self.word_limit_exceeded = False
         self.lock = None  # Will be initialized in crawl()
         
         # Language code to name mapping
@@ -293,6 +294,9 @@ class WebCrawlerJSConcurrent:
         """Crawl a single page and return found links."""
         found_urls = set()
         
+        if self.word_limit_exceeded:
+            return found_urls
+
         try:
             print(f"Crawling: {url}")
             
@@ -328,9 +332,16 @@ class WebCrawlerJSConcurrent:
                 self.page_languages[url] = language
                 self.technologies.update(technologies)
                 self.total_words += word_count
+                
+                if self.total_words > 10000000:
+                    self.word_limit_exceeded = True
+                    print(f"  WARNING: Word limit exceeded ({self.total_words:,} > 10,000,000). Stopping crawl.")
             
             print(f"  Words: {word_count:,} [{language}] - Total: {self.total_words:,}")
             
+            if self.word_limit_exceeded:
+                return found_urls
+
             for link in soup.find_all('a', href=True):
                 absolute_url = urljoin(url, link['href'])
                 normalized_url = self.normalize_url(absolute_url)
@@ -361,6 +372,10 @@ class WebCrawlerJSConcurrent:
                 except asyncio.TimeoutError:
                     break
                 
+                if self.word_limit_exceeded:
+                    queue.task_done()
+                    break
+
                 # Only stop if we have processed enough pages, but here we are checking visited_urls
                 # which includes queued pages. If we strictly control adding to queue, we should process
                 # what is in the queue.
@@ -662,7 +677,11 @@ def main():
                             crawler.save_results_csv()
                     
                     if crawl_success:
-                        tracker.update_status(website, 'completed')
+                        if crawler.word_limit_exceeded:
+                            print(f"  -> Site skipped due to size limit (>10M words).")
+                            tracker.update_status(website, 'skipped_too_large')
+                        else:
+                            tracker.update_status(website, 'completed')
                         
                 except KeyboardInterrupt:
                     print("\nCrawl interrupted by user.")

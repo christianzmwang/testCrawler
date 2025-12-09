@@ -40,6 +40,7 @@ class WebCrawler:
         self.page_categories: Dict[str, str] = {}  # URL -> category
         self.page_languages: Dict[str, str] = {}  # URL -> language
         self.total_words = 0
+        self.word_limit_exceeded = False
         self.max_workers = max_workers
         
         # Thread-safe locks for concurrent access
@@ -234,6 +235,9 @@ class WebCrawler:
         """
         found_urls = set()
         
+        if self.word_limit_exceeded:
+            return found_urls
+
         try:
             print(f"Crawling: {url}")
             response = self.session.get(url, timeout=30)
@@ -268,10 +272,17 @@ class WebCrawler:
                 self.page_languages[url] = language
                 self.total_words += word_count
                 total_so_far = self.total_words
+                
+                if self.total_words > 10000000:
+                    self.word_limit_exceeded = True
+                    print(f"  WARNING: Word limit exceeded ({self.total_words:,} > 10,000,000). Stopping crawl.")
             
             print(f"  Words on this page: {word_count:,} [{language}]")
             print(f"  Total words so far: {total_so_far:,}")
             
+            if self.word_limit_exceeded:
+                return found_urls
+
             # Find all links
             for link in soup.find_all('a', href=True):
                 absolute_url = urljoin(url, link['href'])
@@ -313,7 +324,7 @@ class WebCrawler:
             
             while to_visit or futures:
                 # Submit new tasks while we have URLs and haven't hit the limit
-                reached_limit = max_pages is not None and len(self.visited_urls) >= max_pages
+                reached_limit = (max_pages is not None and len(self.visited_urls) >= max_pages) or self.word_limit_exceeded
                 while to_visit and not reached_limit and len(futures) < self.max_workers * 2:
                     url = to_visit.popleft()
                     
@@ -338,15 +349,16 @@ class WebCrawler:
                                 found_urls = future.result()
                                 
                                 # Add new URLs to queue (thread-safe)
-                                for new_url in found_urls:
-                                    with self.visited_lock:
-                                        can_add = new_url not in self.visited_urls
-                                        if max_pages is not None:
-                                            can_add = can_add and len(self.visited_urls) < max_pages
-                                        
-                                        if can_add:
-                                            self.visited_urls.add(new_url)
-                                            to_visit.append(new_url)
+                                if not self.word_limit_exceeded:
+                                    for new_url in found_urls:
+                                        with self.visited_lock:
+                                            can_add = new_url not in self.visited_urls
+                                            if max_pages is not None:
+                                                can_add = can_add and len(self.visited_urls) < max_pages
+                                            
+                                            if can_add:
+                                                self.visited_urls.add(new_url)
+                                                to_visit.append(new_url)
                             except Exception as e:
                                 print(f"Error processing {url}: {e}")
                             
